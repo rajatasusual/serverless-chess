@@ -7,13 +7,13 @@
     <title>Online Chess Game</title>
 
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="css/style.css">
 
-    <script src="js/chess.min.js"></script>
-    <script src="js/jquery-3.5.1.min.js"></script>
-    <script src="js/chessboard-1.0.0.min.js"></script>
-    <script src="js/peerjs.min.js"></script>
+    <script src="js/libs/chess.min.js"></script>
+    <script src="js/libs/jquery-3.5.1.min.js"></script>
+    <script src="js/libs/chessboard-1.0.0.min.js"></script>
+    <script src="js/libs/peerjs.min.js"></script>
 
 </head>
 
@@ -168,7 +168,12 @@
             <button id="closeShareModalBtn" class="btn btn--outline">Close</button>
         </div>
     </div>
-
+    <script src="js/components/GameEngine.js"></script>
+    <script src="js/components/NetworkManager.js"></script>
+    <script src="js/components/UIManager.js"></script>
+    <script src="js/components/URLManager.js"></script>
+    <script src="js/components/GameController.js"></script>
+    <script src="js/components/EventManager.js"></script>
     <script src="app.js"></script>
 </body>
 
