@@ -7,6 +7,7 @@ class GameController {
         this.networkManager = new NetworkManager();
         this.urlManager = new URLManager();
         this.eventManager = new EventManager(this);
+        this.storageManager = new GameStorageManager();
         this.currentMode = 'local';
 
         this.setupComponentEvents();
@@ -17,7 +18,12 @@ class GameController {
         // Game engine events
         this.gameEngine.on('gameStateChanged', (gameState) => {
             this.uiManager.updateGameStatus(gameState);
-            this.uiManager.updateMoveHistory(gameState.moveHistory);
+            this.uiManager.updateMoveHistoryUI(gameState.moveHistory);
+
+            // Save current game
+            if (gameState.moveHistory.length > 0) {
+                this.storageManager.saveCurrentGame(gameState);
+            }
 
             if (this.currentMode === 'url') {
                 this.urlManager.updateUrl(gameState.fen);
@@ -87,7 +93,30 @@ class GameController {
     initialize() {
         this.uiManager.showMainMenu();
         this.urlManager.checkUrlForGame();
+        this.checkForSavedGame();
     }
+
+    checkForSavedGame() {
+        const savedGame = this.storageManager.loadCurrentGame();
+        if (savedGame) {
+            this.uiManager.showResumeGameOption(savedGame);
+        }
+    }
+
+    resumeSavedGame() {
+        const savedGame = this.storageManager.loadCurrentGame();
+        if (savedGame) {
+            
+            this.currentMode = savedGame.gameMode || 'local';
+
+            this.gameEngine.loadFromSavedGame(savedGame);
+            this.gameEngine.initializeBoard('chessboard');
+
+            this.uiManager.showGameInterface();
+            this.uiManager.updateGameModeDisplay(this.currentMode);
+            this.uiManager.hideResumeGameOption();
+        }
+    }    
 
     // Game mode management
     startLocalGame() {
@@ -209,6 +238,7 @@ class GameController {
         }
 
         this.currentMode = 'local';
+        this.checkForSavedGame();
     }
 
     // Utility methods

@@ -2,6 +2,16 @@
 class UIManager {
     constructor() {
         this.elements = this.getElements();
+        this.setupStorageElements();
+    }
+
+    setupStorageElements(){
+        this.resumeSection = document.getElementById('resumeGameSection');
+        this.resumeGameBtn = document.getElementById('resumeGameBtn');
+        this.resumeGameDate = document.getElementById('resumeGameDate');
+        this.resumeGameMoves = document.getElementById('resumeGameMoves');
+        this.lastSaveTime = document.getElementById('lastSaveTime');
+        this.saveStatus = document.getElementById('saveStatus');
     }
 
     getElements() {
@@ -70,11 +80,11 @@ class UIManager {
             'urlPlay': 'urlPlayModal',
             'shareGame': 'shareGameModal'
         };
-        
+
         const modalKey = modalMap[modalType];
         if (modalKey) {
             this.show(modalKey);
-            
+
             // Focus input fields
             if (modalType === 'joinRoom' && this.elements.roomCodeInput) {
                 setTimeout(() => this.elements.roomCodeInput.focus(), 100);
@@ -105,7 +115,7 @@ class UIManager {
         } else {
             const turn = gameState.turn === 'w' ? 'White' : 'Black';
             status = `${turn}'s turn`;
-            
+
             if (gameState.isCheck) {
                 message = `${turn} is in check!`;
                 statusClass = 'status--error';
@@ -114,7 +124,7 @@ class UIManager {
 
         this.elements.gameStatus.className = `status ${statusClass}`;
         this.elements.gameStatus.textContent = status;
-        
+
         if (this.elements.gameMessage) {
             this.elements.gameMessage.textContent = message;
         }
@@ -131,7 +141,7 @@ class UIManager {
         }
     }
 
-    updateMoveHistory(moveHistory) {
+    updateMoveHistoryUI(moveHistory) {
         if (!this.elements.movesList) return;
 
         this.elements.movesList.innerHTML = '';
@@ -209,7 +219,7 @@ class UIManager {
     updatePlayerStatus(playerColor, isOnlineGame) {
         const whiteStatus = this.elements.playerWhite?.querySelector('.player-status');
         const blackStatus = this.elements.playerBlack?.querySelector('.player-status');
-        
+
         if (whiteStatus && blackStatus) {
             if (isOnlineGame) {
                 whiteStatus.textContent = playerColor === 'white' ? 'You' : 'Opponent';
@@ -219,6 +229,17 @@ class UIManager {
                 blackStatus.textContent = '';
             }
         }
+    }
+
+    // --- Resume Game UI ---
+    showResumeGameOption(savedGame) {
+        if (!savedGame) return;
+        this.resumeSection.classList.remove('hidden');
+        this.resumeGameDate.textContent = new Date(savedGame.timestamp).toLocaleString();
+        this.resumeGameMoves.textContent = savedGame.moveHistory ? savedGame.moveHistory.length : 0;
+    }
+    hideResumeGameOption() {
+        this.resumeSection.classList.add('hidden');
     }
 
     async copyToClipboard(text, buttonId) {

@@ -661,6 +661,14 @@ select.form-control {
   display: none !important;
 }
 
+.resume-card {
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  padding: var(--space-16);
+  box-shadow: var(--shadow);
+  margin-bottom: var(--space-16);
+}
+
 /* Main Menu Styles */
 .main-menu {
   max-width: 400px;

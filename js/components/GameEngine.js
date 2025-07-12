@@ -100,7 +100,7 @@ class GameEngine {
 
     undoMove() {
         if (this.moveHistory.length === 0) return false;
-        
+
         const result = this.game.undo();
         if (result && this.board) {
             this.board.position(this.game.fen());
@@ -130,6 +130,21 @@ class GameEngine {
             return true;
         } catch (error) {
             console.error('Invalid FEN:', error);
+            return false;
+        }
+    }
+
+    loadFromSavedGame(savedGame) {
+        try {
+            const history = savedGame.moveHistory;
+            this.game = new Chess();
+            for (var i = 0; i < history.length; i++) {
+                this.game.move(history[i]);
+            }
+            this.trigger('gameStateChanged', this.getGameState());
+            return true;
+        } catch (error) {
+            console.error('Invalid game state:', error);
             return false;
         }
     }

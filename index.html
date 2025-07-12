@@ -26,6 +26,22 @@
                 <p>Play chess locally or online with friends</p>
             </div>
 
+            <!-- Resume Game Section -->
+            <div id="resumeGameSection" class="resume-section hidden">
+                <div class="resume-card">
+                    <h3>Resume Previous Game</h3>
+                    <div id="resumeGameInfo" class="resume-info">
+                        <p class="resume-title">Game saved on: <span id="resumeGameDate"></span></p>
+                        <p class="resume-details">
+                            Moves: <span id="resumeGameMoves"></span>
+                        </p>
+                    </div>
+                    <div class="resume-actions">
+                        <button id="resumeGameBtn" class="btn btn-primary btn--lg btn--full-width">Resume Game</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="menu-buttons">
                 <button id="playLocalBtn" class="btn btn--primary btn--lg btn--full-width">
                     Play Locally
@@ -170,6 +186,7 @@
     </div>
     <script src="js/components/GameEngine.js"></script>
     <script src="js/components/NetworkManager.js"></script>
+    <script src="js/components/StorageManager.js"></script>
     <script src="js/components/UIManager.js"></script>
     <script src="js/components/URLManager.js"></script>
     <script src="js/components/GameController.js"></script>

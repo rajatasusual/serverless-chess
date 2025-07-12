@@ -42,6 +42,10 @@ class EventManager {
         this.addButtonHandler('playFromUrlBtn', () => {
             this.gameController.showUrlPlayModal();
         });
+
+        this.addButtonHandler('resumeGameBtn', () => {
+            this.gameController.resumeSavedGame();
+        });
     }
 
     setupModalEvents() {
@@ -250,12 +254,11 @@ class EventManager {
     // Event handling for page lifecycle
     handlePageHidden() {
         // Pause timers, save state, etc.
-        console.log('Page hidden - pausing activities');
+        
     }
 
     handlePageVisible() {
         // Resume timers, refresh state, etc.
-        console.log('Page visible - resuming activities');
     }
 
     handlePageUnload(e) {
