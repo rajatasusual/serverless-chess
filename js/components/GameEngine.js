@@ -56,7 +56,7 @@ class GameEngine {
     }
 
     onDragStart(source, piece) {
-        if (this.game.game_over()) return false;
+        if (this.game.isGameOver()) return false;
 
         if (this.isOnlineGame) {
             if (this.game.turn() !== this.playerColor[0]) return false;
@@ -74,17 +74,20 @@ class GameEngine {
     }
 
     onDrop(source, target) {
-        const move = this.game.move({
-            from: source,
-            to: target,
-            promotion: 'q'
-        });
+        try {
+            const move = this.game.move({
+                from: source,
+                to: target,
+                promotion: 'q'
+            });
+            this.updateMoveHistory();
+            this.trigger('moveMade', { move });
+            this.trigger('gameStateChanged', this.getGameState());
+        } catch (error) {
+            return 'snapback';
+        }
 
-        if (move === null) return 'snapback';
 
-        this.updateMoveHistory();
-        this.trigger('moveMade', { move });
-        this.trigger('gameStateChanged', this.getGameState());
         return true;
     }
 
@@ -153,11 +156,11 @@ class GameEngine {
         return {
             fen: this.game.fen(),
             turn: this.game.turn(),
-            isCheck: this.game.in_check(),
-            isCheckmate: this.game.in_checkmate(),
-            isStalemate: this.game.in_stalemate(),
-            isDraw: this.game.in_draw(),
-            isGameOver: this.game.game_over(),
+            isCheck: this.game.isCheck(),
+            isCheckmate: this.game.isCheckmate(),
+            isStalemate: this.game.isStalemate(),
+            isDraw: this.game.isDraw(),
+            isGameOver: this.game.isGameOver(),
             moveHistory: [...this.moveHistory]
         };
     }
