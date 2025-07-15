@@ -39,7 +39,10 @@ class UIManager {
             shareUrlDisplay: document.getElementById('shareUrlDisplay'),
             currentRoomCode: document.getElementById('currentRoomCode'),
             roomStatus: document.getElementById('roomStatus'),
-            joinStatus: document.getElementById('joinStatus')
+            joinStatus: document.getElementById('joinStatus'),
+            moveSound: document.getElementById('moveSound'),
+            checkSound: document.getElementById('checkSound'),
+            checkmateSound: document.getElementById('checkmateSound'),
         };
     }
 
@@ -109,6 +112,8 @@ class UIManager {
             const winner = gameState.turn === 'w' ? 'Black' : 'White';
             status = `${winner} wins by checkmate!`;
             statusClass = 'status--success';
+
+            this.playSound(this.elements.checkmateSound);
         } else if (gameState.isStalemate) {
             status = 'Stalemate - Draw!';
             statusClass = 'status--warning';
@@ -122,6 +127,10 @@ class UIManager {
             if (gameState.isCheck) {
                 message = `${turn} is in check!`;
                 statusClass = 'status--error';
+
+                this.playSound(this.elements.checkSound);
+            } else {
+                this.playSound(this.elements.moveSound);
             }
         }
 
@@ -327,5 +336,12 @@ class UIManager {
     getSquareElement(square) {
         // This works with the standard chessboard.js CSS classes
         return $('#chessboard').find('.square-' + square);
+    }
+
+    playSound(sound) {
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play();
+        }
     }
 }
