@@ -8,6 +8,11 @@ class GameEngine {
         this.playerColor = 'white';
         this.isOnlineGame = false;
         this.eventHandlers = {};
+        
+        this.boardId = 'chessboard';
+
+        this.lastMove = null;
+        this.legalMoveHighlights = [];
     }
 
     // Event system
@@ -33,6 +38,9 @@ class GameEngine {
     // Initialize chess board
     initializeBoard(boardId) {
         try {
+
+            this.boardId = boardId;
+            
             const config = {
                 position: this.game.fen(),
                 draggable: true,
@@ -70,11 +78,22 @@ class GameEngine {
                 return false;
             }
         }
+
+        // Clear any existing highlights
+        this.clearLegalMoveHighlights();
+
+        // Show legal moves for this piece
+        this.highlightLegalMoves(source);
+
         return true;
     }
 
     onDrop(source, target) {
         try {
+
+            // Clear legal move highlights
+            this.clearLegalMoveHighlights();
+
             const move = this.game.move({
                 from: source,
                 to: target,
@@ -83,12 +102,85 @@ class GameEngine {
             this.updateMoveHistory();
             this.trigger('moveMade', { move });
             this.trigger('gameStateChanged', this.getGameState());
+
+            // Highlight the last move
+            this.highlightLastMove(move);
+
+            // Store the last move for highlighting
+            this.lastMove = move;
         } catch (error) {
             return 'snapback';
         }
 
 
         return true;
+    }
+
+    // Legal move highlighting methods
+    highlightLegalMoves(square) {
+        const moves = this.game.moves({
+            square: square,
+            verbose: true
+        });
+
+        if (moves.length === 0) return;
+
+        // Highlight the source square
+        this.highlightSquare(square, 'legal-move-source');
+        
+        // Highlight all possible target squares
+        moves.forEach(move => {
+            this.highlightSquare(move.to, 'legal-move-target');
+        });
+        
+        this.legalMoveHighlights = [square, ...moves.map(m => m.to)];
+    }
+
+    clearLegalMoveHighlights() {
+        this.legalMoveHighlights.forEach(square => {
+            this.removeHighlight(square, 'legal-move-source');
+            this.removeHighlight(square, 'legal-move-target');
+        });
+        this.legalMoveHighlights = [];
+    }
+
+    // Last move highlighting methods
+    highlightLastMove(move) {
+        // Clear previous last move highlights
+        this.clearLastMoveHighlights();
+        
+        if (move) {
+            // Highlight from and to squares
+            this.highlightSquare(move.from, 'last-move-from');
+            this.highlightSquare(move.to, 'last-move-to');
+        }
+    }
+
+    clearLastMoveHighlights() {
+        if (this.lastMove) {
+            this.removeHighlight(this.lastMove.from, 'last-move-from');
+            this.removeHighlight(this.lastMove.to, 'last-move-to');
+        }
+    }
+
+    // Utility highlighting methods
+    highlightSquare(square, className) {
+        const $square = this.getSquareElement(square);
+        if ($square) {
+            $square.addClass(className);
+        }
+    }
+
+    removeHighlight(square, className) {
+        const $square = this.getSquareElement(square);
+        if ($square) {
+            $square.removeClass(className);
+        }
+    }
+
+    getSquareElement(square) {
+        // This works with the standard chessboard.js CSS classes
+        return $('#' + this.boardId).find('.square-' + square);
     }
 
     makeMove(move) {
@@ -104,7 +196,13 @@ class GameEngine {
     undoMove() {
         if (this.moveHistory.length === 0) return false;
 
+        this.clearLastMoveHighlights();
+
         const result = this.game.undo();
+        if (result) {
+            this.lastMove = result;
+            this.highlightLastMove(result);
+        }
         if (result && this.board) {
             this.board.position(this.game.fen());
             this.updateMoveHistory();
@@ -144,6 +242,7 @@ class GameEngine {
             for (var i = 0; i < history.length; i++) {
                 this.game.move(history[i]);
             }
+            this.isOnlineGame = savedGame.gameMode === 'online' ? true : false;
             this.trigger('gameStateChanged', this.getGameState());
             return true;
         } catch (error) {
@@ -161,7 +260,10 @@ class GameEngine {
             isStalemate: this.game.isStalemate(),
             isDraw: this.game.isDraw(),
             isGameOver: this.game.isGameOver(),
-            moveHistory: [...this.moveHistory]
+            moveHistory: [...this.moveHistory],
+            gameMode: this.gameMode,
+            lastMove: this.lastMove,
+            legalMoveHighlights: this.legalMoveHighlights 
         };
     }
 

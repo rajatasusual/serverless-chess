@@ -109,6 +109,8 @@ class GameController {
             
             this.currentMode = savedGame.gameMode || 'local';
 
+            this.gameEngine.setGameMode(this.currentMode);
+
             this.gameEngine.loadFromSavedGame(savedGame);
             this.gameEngine.initializeBoard('chessboard');
 
