@@ -5,13 +5,16 @@ class UIManager {
         this.setupStorageElements();
     }
 
-    setupStorageElements(){
+    setupStorageElements() {
         this.resumeSection = document.getElementById('resumeGameSection');
         this.resumeGameBtn = document.getElementById('resumeGameBtn');
         this.resumeGameDate = document.getElementById('resumeGameDate');
         this.resumeGameMoves = document.getElementById('resumeGameMoves');
         this.lastSaveTime = document.getElementById('lastSaveTime');
         this.saveStatus = document.getElementById('saveStatus');
+
+        this.lastMove = null;
+        this.legalMoveHighlights = [];
     }
 
     getElements() {
@@ -256,5 +259,73 @@ class UIManager {
         } catch (err) {
             console.error('Failed to copy:', err);
         }
+    }
+
+    // --- Moves Behavior UI ---
+    // Legal move highlighting methods
+    highlightLegalMoves(legalMoves, moves) {
+        
+        this.clearLegalMoveHighlights();
+
+        if (moves.length === 0) return;
+
+        // Highlight the source square
+        this.highlightSquare(legalMoves, 'legal-move-source');
+
+        // Highlight all possible target squares
+        moves.forEach(move => {
+            this.highlightSquare(move.to, 'legal-move-target');
+        });
+
+        this.legalMoveHighlights = [legalMoves, ...moves.map(m => m.to)];
+    }
+
+    clearLegalMoveHighlights() {
+        this.legalMoveHighlights.forEach(square => {
+            this.removeHighlight(square, 'legal-move-source');
+            this.removeHighlight(square, 'legal-move-target');
+        });
+        this.legalMoveHighlights = [];
+    }
+
+    // Last move highlighting methods
+    highlightLastMove(move) {
+        // Clear previous last move highlights
+        this.clearLastMoveHighlights();
+
+        if (move) {
+            // Highlight from and to squares
+            this.highlightSquare(move.from, 'last-move-from');
+            this.highlightSquare(move.to, 'last-move-to');
+        }
+
+        this.lastMove = move;
+    }
+
+    clearLastMoveHighlights() {
+        if (this.lastMove) {
+            this.removeHighlight(this.lastMove.from, 'last-move-from');
+            this.removeHighlight(this.lastMove.to, 'last-move-to');
+        }
+    }
+
+    // Utility highlighting methods
+    highlightSquare(square, className) {
+        const $square = this.getSquareElement(square);
+        if ($square) {
+            $square.addClass(className);
+        }
+    }
+
+    removeHighlight(square, className) {
+        const $square = this.getSquareElement(square);
+        if ($square) {
+            $square.removeClass(className);
+        }
+    }
+
+    getSquareElement(square) {
+        // This works with the standard chessboard.js CSS classes
+        return $('#chessboard').find('.square-' + square);
     }
 }

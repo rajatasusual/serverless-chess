@@ -17,6 +17,8 @@ class GameController {
     setupComponentEvents() {
         // Game engine events
         this.gameEngine.on('gameStateChanged', (gameState) => {
+            this.uiManager.clearLegalMoveHighlights();
+
             this.uiManager.updateGameStatus(gameState);
             this.uiManager.updateMoveHistoryUI(gameState.moveHistory);
 
@@ -30,10 +32,16 @@ class GameController {
             }
         });
 
-        this.gameEngine.on('moveMade', (data) => {
+        this.gameEngine.on('moveStarted', (obj) => {
+            this.uiManager.highlightLegalMoves(obj.source, obj.legalMoves);
+        });
+
+        this.gameEngine.on('moveMade', (move) => {
             if (this.currentMode === 'online') {
-                this.networkManager.sendMove(data.move);
+                this.networkManager.sendMove(move);
             }
+
+            this.uiManager.highlightLastMove(move);
         });
 
         // Network events
